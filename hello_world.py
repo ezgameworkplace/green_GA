@@ -7,13 +7,14 @@ from multiprocessing import Process
 from retrying import retry
 import time
 from ui_control import sdk_connection
-
+import ingame
 
 @retry(wait_fixed=2000)
 def get_in_game(connection, package_name, package_main_activity_name):
     connection.reboot()
     connection.restart_game(package_name, package_main_activity_name)
     time.sleep(2)
+    ingame.into_lobby(connection)
 
 
 @retry(wait_fixed=2000)
