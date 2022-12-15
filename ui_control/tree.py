@@ -7,11 +7,11 @@ import lxml.etree as ET
 import xml.dom.minidom
 import xml.etree.ElementTree
 
-
 ExactSearch = 1
 FuzzySearch = 0
 CaseSensitive = 1
 CaseInsensitive = 0
+
 
 class UITree(object):
 
@@ -32,12 +32,12 @@ class UITree(object):
     def xml_tree(self, tree):
         self._xml_tree = tree
 
-    def get_pretty_tree(self)->str:
+    def get_pretty_tree(self) -> str:
         _xml = xml.dom.minidom.parseString(self._xml_tree)
         pretty_xml_as_string = _xml.toprettyxml()
         return pretty_xml_as_string
 
-    def get_all_nodes(self)->[ET._Element]:
+    def get_all_nodes(self) -> [ET._Element]:
         tree = ET.fromstring(self._xml_tree)
         ret = []
         for branches in tree.iter():
@@ -54,13 +54,13 @@ class UITree(object):
             parsed_tree = ET.fromstring(tree.lower())
             return parsed_tree
 
-    def __parsed_search(self, search:str, case=CaseSensitive):
+    def __parsed_search(self, search: str, case=CaseSensitive):
         if case == CaseSensitive:
             return search
         elif case == CaseInsensitive:
             return search.lower()
 
-    def __get_nodes_by_attr_value(self, attr, search, mode=ExactSearch, case=CaseSensitive)->[ET._Element]:
+    def __get_nodes_by_attr_value(self, attr, search, mode=ExactSearch, case=CaseSensitive) -> [ET._Element]:
         tree = self.__parsed_tree(case)
         parsed_search = self.__parsed_search(search, case)
         ret = []
@@ -76,9 +76,8 @@ class UITree(object):
         ret = sum(ret, [])
         return ret
 
-    def get_node_attr(self, node:[ET._Element])->dict:
+    def get_node_attr(self, node: [ET._Element]) -> dict:
         return node.attrib
 
-    def get_nodes_by_attr_value(self, attr:str, search:str, mode=ExactSearch, case=CaseSensitive)->[dict]:
+    def get_nodes_by_attr_value(self, attr: str, search: str, mode=ExactSearch, case=CaseSensitive) -> [dict]:
         return [self.get_node_attr(node) for node in self.__get_nodes_by_attr_value(attr, search, mode, case)]
-

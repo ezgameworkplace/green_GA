@@ -3,8 +3,9 @@ File:device.py
 Author:ezgameworkplace
 Date:2022/12/7
 '''
-class Device(object):
 
+
+class Device(object):
     phone = 'phone'
     nox_vb = 'nox virtual box'
 
@@ -20,14 +21,15 @@ class Device(object):
     def type(self):
         return self.__type
 
-
     def __str__(self):
         return f'device serial:{self.serial}\tdevice type:{self.__type}'
+
 
 class Phone(Device):
 
     def __init__(self):
         super().__init__(self.serial, self.phone)
+
 
 class Nox_VB(Device):
 
