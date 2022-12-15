@@ -5,10 +5,10 @@ Date:2022/11/24
 '''
 import subprocess
 
+
 # 参考 https://support.yeshen.com/zh-CN/qt/adb
 
 class NoxConsole():
-
     __slots__ = ['_console_path', '_encoding']
 
     def __init__(self, console_path, encoding='ANSI'):
@@ -105,7 +105,7 @@ class NoxConsole():
         return self._send_cmd(cmd)
 
     @property
-    def running_vb(self)->list:
+    def running_vb(self) -> list:
         vb_names = self.vb_names
         vb_pids = self.vb_pids
         return [v for i, v in enumerate(vb_names) if vb_pids[i] != '-1']
@@ -113,37 +113,37 @@ class NoxConsole():
     @property
     def vb_indices(self):
         out = self.list_vb
-        return [i.split(',')[0] for i in out.split('\n') if i!='']
+        return [i.split(',')[0] for i in out.split('\n') if i != '']
 
     @property
     def vb_init_names(self):
         out = self.list_vb
-        return [i.split(',')[1] for i in out.split('\n') if i!='']
+        return [i.split(',')[1] for i in out.split('\n') if i != '']
 
     @property
     def vb_names(self):
         out = self.list_vb
-        return [i.split(',')[2] for i in out.split('\n') if i!='']
+        return [i.split(',')[2] for i in out.split('\n') if i != '']
 
     @property
     def vb_top_windows(self):
         out = self.list_vb
-        return [i.split(',')[3] for i in out.split('\n') if i!='']
+        return [i.split(',')[3] for i in out.split('\n') if i != '']
 
     @property
     def vb_toolbar_windows(self):
-        out= self.list_vb
-        return [i.split(',')[4] for i in out.split('\n') if i!='']
+        out = self.list_vb
+        return [i.split(',')[4] for i in out.split('\n') if i != '']
 
     @property
     def vb_bound_windows(self):
         out = self.list_vb
-        return [i.split(',')[5] for i in out.split('\n') if i!='']
+        return [i.split(',')[5] for i in out.split('\n') if i != '']
 
     @property
     def vb_pids(self):
         out = self.list_vb
-        return [i.split(',')[6] for i in out.split('\n') if i!='']
+        return [i.split(',')[6] for i in out.split('\n') if i != '']
 
     def reboot(self, name, index=None):
         if index:
@@ -158,4 +158,3 @@ class NoxConsole():
         else:
             cmd = fr"{self.console_path} rename -name:{old} -title:{new}"
         return self._send_cmd(cmd)
-
