@@ -150,7 +150,7 @@ class UnitySDK(object):
     def __init__(self, ip: int or str, port: int or str, serial: str, real_phone: bool, package_name: str,
                  package_main_activity_name: str, sdk_port: int or str = '27019', nox_console_path: str = None,
                  nox_name: str = None, encoding: str = 'utf-8', timeout: int = 2, update_connection: int = 5,
-                 ui_delay: int = 0.1, connect_at_init: bool = False, width_dif: float = 0, height_dif: float = 0,
+                 ui_delay: float = 0.1, connect_at_init: bool = False, width_dif: float = 0, height_dif: float = 0,
                  reboot_limit=60, restart_limit=60):
         self.__ip = ip
         self.__port = port
