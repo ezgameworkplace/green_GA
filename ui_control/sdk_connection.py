@@ -4,10 +4,12 @@ Author:ezgameworkplace
 Date:2022/11/27
 '''
 import time
-from ui_control.adb_connection import Screen, ADBConnection
+
+from ui_control.adb_connection import ADBConnection, Screen
 from ui_control.client_socket import ClientSocket
+from ui_control.debug_log import debug_log
 from ui_control.nox_console import NoxConsole
-from ui_control.tree import UITree, ExactSearch, FuzzySearch, CaseSensitive, CaseInsensitive
+from ui_control.tree import UITree, ExactSearch, FuzzySearch, CaseSensitive
 
 
 class ElementBound(object):
@@ -186,8 +188,20 @@ class UnitySDK(object):
         return f'ip:{self.__ip}\nport:{self.__port}\nserial:{self.__serial}\nadb_connection:{self.__adb_connection}\nsocket:{self.__socket}\nnox_console:{self.__nox_console}'
 
     @property
+    def port(self) -> str:
+        return self.__port
+
+    @property
+    def nox_name(self) -> str:
+        return self.__nox_name
+
+    @property
     def adb_connection(self) -> ADBConnection:
         return self.__adb_connection
+
+    @property
+    def serial(self) -> str:
+        return self.__serial
 
     @property
     def socket(self) -> ClientSocket:
@@ -222,9 +236,17 @@ class UnitySDK(object):
     def package_name(self):
         return self.__package_name
 
+    @package_name.setter
+    def package_name(self, v: str):
+        self.__package_name = v
+
     @property
     def package_main_activity_name(self):
         return self.__package_main_activity_name
+
+    @package_main_activity_name.setter
+    def package_main_activity_name(self, v: str):
+        self.__package_main_activity_name = v
 
     @property
     def connected(self) -> bool:
@@ -238,6 +260,14 @@ class UnitySDK(object):
     @property
     def real_phone(self) -> bool:
         return self.__real_phone
+
+    @property
+    def device_screen(self) -> 'Screen':
+        return self.adb_connection.get_device_cur_screen()
+
+    @property
+    def app_screen(self) -> 'Screen':
+        return self.adb_connection.get_device_app_screen()
 
     def __reboot(self) -> None:
         # FIXME 某些手机启动后会显示adb已连接，activity还未准备，造成无法重启app，需要加入等待时间
@@ -326,6 +356,7 @@ class UnitySDK(object):
     def __send_command(self, command: int, param: str or int = None) -> dict:
         return self.__socket.send_command(command, param)
 
+    @debug_log
     def send_command(self, command: int, param: str or int = None) -> dict:
         if self.__ui_delay > 0:
             time.sleep(self.__ui_delay)
@@ -348,8 +379,25 @@ class UnitySDK(object):
         elements = self.send_command(Commands.FIND_ELEMENT_PATH, parsed_nodes)
         return [self.search_element_by_id(e["instance"]) for e in elements]
 
+    def find_element_by_path_and_location(self, path: str, x: float, y: float,
+                                          error: float = 50) -> 'Element' or None:
+        # 存在同名element的时候，通过在屏幕上的坐标来选择，默认允许误差50
+        elements = self.find_elements_by_path(path)
+
+        for e in elements:
+            bound = self.get_element_bound(e)
+
+            x_error = round(abs(bound.x - x), 2)
+            y_error = round(abs(bound.y - y), 2)
+
+            if x_error <= error and y_error <= error:
+                return e
+
+        return None
+
     def find_element(self, path: str) -> Element or None:
         # FIXME 补全Element，需要修改sdk的C#代码
+        # FIXME 加入参数visible，区分可见和不可见
         # 根据path找到元素,path可以不全,不补全path,同名只返回第一个
         ret = self.send_command(Commands.FIND_ELEMENTS, [path])
         if ret:

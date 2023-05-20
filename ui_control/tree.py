@@ -3,9 +3,10 @@ File:tree.py
 Author:ezgameworkplace
 Date:2022/12/4
 '''
-import lxml.etree as ET
 import xml.dom.minidom
 import xml.etree.ElementTree
+
+import lxml.etree as ET
 
 ExactSearch = 1
 FuzzySearch = 0

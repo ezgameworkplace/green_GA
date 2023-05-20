@@ -3,7 +3,9 @@ File:client_socket.py
 Author:ezgameworkplace
 Date:2022/11/25
 '''
-import json, socket, struct
+import json
+import socket
+import struct
 
 
 class ClientSocket:
@@ -71,6 +73,7 @@ class ClientSocket:
         self._client_socket.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
         self._client_socket.setsockopt(socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1)
         self._client_socket.settimeout(self.__timeout)
+        self._client_socket.setblocking(True)
         return self._client_socket
 
     def __connect(self):

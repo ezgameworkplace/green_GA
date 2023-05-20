@@ -55,6 +55,8 @@ class ADBConnection():
         devices_header = 'List of devices attached'
         devices_connected = 'device'
         ret = self.__connected_devices()
+        if isinstance(ret, tuple): # 有时候是tuple 有时候是str
+            ret = ret[0]
         lines = [line for line in ret.split('\n') if line != '' and line != devices_header]
         tabs = [line.split('\t') for line in lines]
         devices_serial = [tab[0] for tab in tabs if tab[1] == devices_connected]
@@ -75,9 +77,10 @@ class ADBConnection():
         ret = subprocess.Popen(cmd, encoding=self.__encoding, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         # ret.wait()
         out, err = ret.communicate()
-        if err:
-            raise Exception(f"command failed,\nerr:{err}")
-        return out
+        # # FIXME 安装的时候 err的返回 会是 Success
+        # if err:
+        #     raise Exception(f"command failed,\nerr:{err}")
+        return out, err
 
     def run_adb_cmd(self, cmd, mode=MultipleDevice):
         if mode == self.MultipleDevice:
@@ -183,6 +186,12 @@ class ADBConnection():
             ret = search_dif[0]
         ret = [i for i in ret if i != '']
         init = ret[0][5:].split('x')
+        # init = ret[0][5:].split('x')
+        # cur = [info[4:].split('x') for info in ret if 'cur=' in info]
+        # flatten_cur = [item for sublist in cur for item in sublist]
+        # app = [info[4:].split('x') for info in ret if 'app=' in info]
+        # flatten_app = [item for sublist in app for item in sublist]
+        #  # FIXME 用正则表达式
         cur = ret[2][4:].split('x')
         app = ret[3][4:].split('x')
         return Screen(init[0], init[1]), Screen(cur[0], cur[1]), Screen(app[0], app[1])
@@ -210,21 +219,26 @@ class ADBConnection():
         adb_cmd = f'pidof {package_name}'
         return self.run_shell_cmd(adb_cmd)
 
-    def return_pid(self, package_name) -> int:
+    def return_pid(self, package_name) -> bool:
         # FIXME
-        # ps = self.__ps()
+        ps = self.__ps()
+        # print("ps", ps)
+        for line in ps:
+            if package_name in line:
+                return True
+        return False
         # lines = ps.split('\n')
         # package = [line for line in lines if f'{package_name}' in line][0]
         # name = package.split(' ')
         # pid = name[4]
         # print(pid)
         # return int(pid)
-        ret = int(self.__return_pid(package_name))
-        return ret
+        # ret = int(self.__return_pid(package_name))
+        # return ret
 
     def check_app_running(self, package_name) -> bool:
         try:
-            if self.return_pid(package_name) != None:
+            if self.return_pid(package_name):
                 return True
             else:
                 return False
