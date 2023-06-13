@@ -11,7 +11,7 @@ import struct
 class ClientSocket:
     __slots__ = ['__ip', '__port', '__encoding', '__timeout', '_client_socket', '__connected']
 
-    def __init__(self, ip: str, port: int, encoding: str = 'utf-8', timeout: int = 2):
+    def __init__(self, ip: str, port: str, encoding: str = 'utf-8', timeout: int = 2):
         self.__ip = ip
         self.__port = port
         self.__encoding = encoding
@@ -142,3 +142,10 @@ class ClientSocket:
         self._send_data(command)
         ret = self._recv_data()
         return ret
+
+if __name__ == '__main__':
+    ip = "localhost"
+    local = "20002"
+    socket1 = ClientSocket(ip, local)
+    socket1.connect() # if using adb , must connect tcp
+    print("socket is connected? :", socket1.connected)

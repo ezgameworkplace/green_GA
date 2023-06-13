@@ -4,6 +4,7 @@ Author:ezgameworkplace
 Date:2022/11/27
 '''
 import time
+from typing import Tuple
 
 from ui_control.adb_connection import ADBConnection, Screen
 from ui_control.client_socket import ClientSocket
@@ -144,7 +145,7 @@ class Commands(object):
 
 
 class UnitySDK(object):
-    __slots__ = ['__ip', '__port', '__serial', '__sdk_port', '__adb_connection', '__socket', '__nox_console',
+    __slots__ = ['__ip', '__port', '__serial', '__sdk_port', '__tcp', '__adb_connection', '__socket', '__nox_console',
                  '__nox_name', '__encoding', '__timeout', '__update_connection', '__ui_delay', '__real_phone',
                  '__connected', '__ui_tree', '__width_dif', '__height_dif', '__reboot_limit', '__restart_limit',
                  '__package_name', '__package_main_activity_name']
@@ -165,6 +166,7 @@ class UnitySDK(object):
         self.__ui_delay = ui_delay
         self.__real_phone = real_phone
         self.__connected = False
+        self.__tcp = (self.__port, self.__sdk_port)
         self.__adb_connection = ADBConnection(serial=self.__serial, encoding=self.__encoding, local_port=self.__port,
                                               device_port=self.__sdk_port)
         self.__socket = ClientSocket(ip=self.__ip, port=self.__port, encoding=self.__encoding, timeout=self.__timeout)
@@ -190,6 +192,14 @@ class UnitySDK(object):
     @property
     def port(self) -> str:
         return self.__port
+
+    @property
+    def tcp(self):
+        return self.__tcp
+
+    @tcp.setter
+    def tcp(self, v:Tuple[str,str]):
+        self.__tcp = v
 
     @property
     def nox_name(self) -> str:
@@ -250,7 +260,7 @@ class UnitySDK(object):
 
     @property
     def connected(self) -> bool:
-        if self.adb_connection.check_adb_connection_ready(
+        if self.adb_connection.check_adb_connection_ready(self.tcp,
                 self.__package_name) == True and self.socket.connected == True:
             self.__connected = True
         else:
@@ -282,13 +292,20 @@ class UnitySDK(object):
 
     def reboot(self) -> None:
         self.__reboot()
-        wait_time = self.__update_connection
-        time_limit = self.__reboot_limit
-        while self.adb_connection.connected != True and time_limit > 0:  # 加入时间限制
-            time_limit = time_limit - wait_time
-            time.sleep(wait_time)
+        self.__wait_reboot()
+
         if self.adb_connection.connected != True:
             raise Exception(f'device reboot failed after {self.__reboot_limit} seconds')
+
+        self.__connect_tcp()
+
+    def __wait_reboot(self) -> None:  # 加入重启的时间限制
+        wait_time = self.__update_connection
+        time_limit = self.__reboot_limit
+        while self.adb_connection.connected != True and time_limit > 0:
+            time_limit = time_limit - wait_time
+            time.sleep(wait_time)
+
 
     def start_app(self, package_name: str, package_main_activity_name: str) -> None:
         self.__adb_connection.start_app(package_name, package_main_activity_name)
@@ -311,12 +328,15 @@ class UnitySDK(object):
             time_limit = time_limit - wait_time
             time.sleep(wait_time)
 
-    def __connect(self) -> None:
+    def __connect_tcp(self) -> None:
         self.__adb_connection.tcp_forward(self.__port, self.__sdk_port)
-        self.__socket.client_socket = self.__socket.reconnect_socket()
+
+    def __connect_socket(self) -> None:
+        self.__socket.client_socket = self.__socket.connect()
 
     def connect(self) -> None:
-        self.__connect()
+        self.__connect_tcp()
+        self.__connect_socket()
 
     def __disconnect(self) -> None:
         try:
@@ -331,7 +351,11 @@ class UnitySDK(object):
     def disconnect(self) -> None:
         self.__disconnect()
 
-    def restart_game(self, package_name: str, package_main_activity_name: str) -> None:
+    def restart_game(self, package_name: str=None, package_main_activity_name: str=None) -> None:
+        if not package_name:
+            package_name = self.package_name
+        if not package_main_activity_name:
+            package_main_activity_name = self.package_main_activity_name
         wait_time = self.__update_connection
         time_limit = self.__restart_limit
         self.restart_app(package_name, package_main_activity_name)

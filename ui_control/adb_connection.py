@@ -3,7 +3,9 @@ File:adb_connection.py
 Author:ezgameworkplace
 Date:2022/11/25
 '''
+import re
 import subprocess
+from typing import List, Tuple
 
 
 class Screen():
@@ -44,8 +46,20 @@ class ADBConnection():
         return self.__serial
 
     @property
+    def local_port(self):
+        return self.__local_port
+
+    @local_port.setter
+    def local_port(self, v):
+        self.__local_port = v
+
+    @property
     def device_port(self):
         return self.__device_port
+
+    @device_port.setter
+    def device_port(self, v):
+        self.__device_port = v
 
     def __connected_devices(self):
         adb_cmd = f'devices'
@@ -55,7 +69,7 @@ class ADBConnection():
         devices_header = 'List of devices attached'
         devices_connected = 'device'
         ret = self.__connected_devices()
-        if isinstance(ret, tuple): # 有时候是tuple 有时候是str
+        if isinstance(ret, tuple):  # 有时候是tuple 有时候是str
             ret = ret[0]
         lines = [line for line in ret.split('\n') if line != '' and line != devices_header]
         tabs = [line.split('\t') for line in lines]
@@ -78,9 +92,12 @@ class ADBConnection():
         # ret.wait()
         out, err = ret.communicate()
         # # FIXME 安装的时候 err的返回 会是 Success
-        # if err:
-        #     raise Exception(f"command failed,\nerr:{err}")
-        return out, err
+        if err:
+            if "Success" in err:
+                print("Hello, I am trash vivo, I can't install through adb")
+            else:
+                raise Exception(f"command failed,\nerr:{err}")
+        return out
 
     def run_adb_cmd(self, cmd, mode=MultipleDevice):
         if mode == self.MultipleDevice:
@@ -102,16 +119,19 @@ class ADBConnection():
 
     def __tcp_forward(self, src, dst):
         adb_cmd = f"forward tcp:{src} tcp:{dst}"
-        return self.run_adb_cmd(adb_cmd)
+        self.run_adb_cmd(adb_cmd)
 
     def tcp_forward(self, src, dst):
-        ret = self.__tcp_forward(src, dst)
-        return ret
+        self.__tcp_forward(src, dst)
 
     def tcp_remove(self, src):
         adb_cmd = f"forward --remove tcp:{src}"
         ret = self.run_adb_cmd(adb_cmd)
         return ret
+
+    def tcp_remove_all(self):
+        for tcp in self.connected_tcp:
+            self.tcp_remove(tcp[0])
 
     def adjusted_device_pos(self, app_x, app_y):
         cur_screen = self.get_device_cur_screen()
@@ -249,24 +269,27 @@ class ADBConnection():
         adb_cmd = 'forward --list'
         return self.run_adb_cmd(adb_cmd)
 
-    def connected_tcp(self):
+    @property
+    def connected_tcp(self) -> List:
         ret = self.__connected_tcp()
         if ret != '\n':
-            ret = [l for l in ret.split('\n') if self.serial in l and self.__device_port in l]
-            ret = [tab.split(' ') for tab in ret]
-            local_ports = [i[1] for i in ret]
-            return local_ports
+            # ret = [l for l in ret.split('\n') if self.serial in l and self.__device_port in l]
+            # ret = [tab.split(' ') for tab in ret]
+            # local_ports = [i[1] for i in ret]
+            pattern = r"tcp:(\d+)\s+tcp:(\d+)"
+            matches = re.findall(pattern, ret, re.MULTILINE)
+            return matches
         else:
             return []
 
-    @property
-    def tcp_connected(self) -> bool:
-        local_ports = self.connected_tcp()
-        if self.__local_port == None:
-            raise Exception('to check tcp connection, you must first have a local port')
-        for port in local_ports:
-            if self.__local_port in port:
-                return True
+    def check_tcp_connected(self, tcp_pair: Tuple[str, str] = None) -> bool:
+        if tcp_pair == None:
+            if self.local_port == None or self.device_port == None:
+                raise Exception(
+                    "You must input tcp_pair or set class local and device ports before check tcp connection")
+            tcp_pair = (self.local_port, self.device_port)
+        if tcp_pair in self.connected_tcp:
+            return True
         return False
 
     def __get_current_focus(self):
@@ -275,6 +298,10 @@ class ADBConnection():
 
     def get_current_focus(self):
         out = self.__get_current_focus()
+        if isinstance(out, tuple):
+            print(len(out))
+            [print(_) for _ in out]
+            out = out[0]
         out = [l for l in out.split('\n') if 'mCurrentFocus' in l]
         return out
 
@@ -285,17 +312,33 @@ class ADBConnection():
                 return True
         return False
 
-    def check_adb_connection_ready(self, package_name):
+    def check_adb_connection_ready(self, tcp_pair:Tuple[str, str], package_name:str) -> bool:
         if self.connected != True:
-            return False
-            # raise Exception('device is not connected')
+            # return False
+            raise Exception('device is not connected')
+        if self.check_tcp_connected(tcp_pair) != True:
+            # return False
+            raise Exception('tcp is not connected')
         if self.check_app_running(package_name) != True:
-            return False
-            # raise Exception('app is not running')
+            # return False
+            raise Exception('app is not running')
         if self.check_app_focused(package_name) != True:
-            return False
-            # raise Exception('app is not focused')
-        if self.tcp_connected != True:
-            return False
-            # raise Exception('tcp is not connected')
+            # return False
+            raise Exception('app is not focused')
         return True
+
+    def __install_package(self, package_path:str) -> None:
+        adb_cmd = f"install -g {package_path}"
+        self.run_adb_cmd(adb_cmd)
+    def install_package(self, package_path:str) -> None:
+        self.__install_package(package_path)
+
+if __name__ == '__main__':
+    serial = 'adb serial'
+    local = "20001"
+    remote = "27019"
+    package_name = 'package_name'
+    install_path = 'path'
+    adb1 = ADBConnection(serial=serial, local_port=local, device_port=remote)
+    adb1.tcp_forward(adb1.local_port, adb1.device_port)
+    adb1.install_package(install_path)

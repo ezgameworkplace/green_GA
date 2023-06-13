@@ -3,11 +3,11 @@ File:hello_world.py
 Author:ezgameworkplace
 Date:2022/12/9
 '''
-from multiprocessing import Process
-from retrying import retry
 import time
-from ui_control import UnitySDK
+from multiprocessing import Process
+
 import ingame
+from ui_control import UnitySDK
 
 
 # @retry(wait_fixed=2000)
@@ -38,15 +38,15 @@ if __name__ == '__main__':
     ip = 'localhost'
     port1 = '60025'  # 本地端口1
     port2 = '60026'  # 本地端口2
-    serial1 = '127.0.0.1:62040'  # adb端口号1
-    serial2 = 'bb928e37'  # adb端口号2
-    nox1 = '62040'  # 模拟器名称1
-    nox2 = '62041'  # 模拟器名称2
+    serial1 = ''  # adb端口号1
+    serial2 = ''  # adb端口号2
+    nox1 = ''  # 模拟器名称1
+    nox2 = ''  # 模拟器名称2
 
     nox_console_path = r"D:\Program Files\Nox\bin\NoxConsole.exe"  # 夜神NoxConsole路径
 
-    package_name = 'com.dts.freefireth'  # 游戏包名
-    package_main_activity_name = 'com.dts.freefireth.FFMainActivity'  # 游戏活动名
+    package_name = ''  # 游戏包名
+    package_main_activity_name = ''  # 游戏活动名
 
     c1 = UnitySDK(ip, port1, serial1, real_phone=False, nox_console_path=nox_console_path, nox_name=nox1,
                   package_name=package_name, package_main_activity_name=package_main_activity_name,
