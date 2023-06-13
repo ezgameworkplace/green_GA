@@ -5,23 +5,16 @@ Date:2022/12/9
 '''
 import time
 from multiprocessing import Process
-
-import ingame
 from ui_control import UnitySDK
 
-
-# @retry(wait_fixed=2000)
 def get_in_game(connection, package_name, package_main_activity_name):
     connection.reboot()
     time.sleep(30)
     connection.restart_game(package_name, package_main_activity_name)
     time.sleep(2)
     connection.connect()
-    print(connection.connected)
-    ingame.into_lobby(connection)
 
 
-# @retry(wait_fixed=2000)
 def multi_devices(c1, c2, package_name, package_main_activity_name):
     p1 = Process(target=get_in_game, args=(c1, package_name, package_main_activity_name))
     p2 = Process(target=get_in_game, args=(c2, package_name, package_main_activity_name))
@@ -43,7 +36,7 @@ if __name__ == '__main__':
     nox1 = ''  # 模拟器名称1
     nox2 = ''  # 模拟器名称2
 
-    nox_console_path = r"D:\Program Files\Nox\bin\NoxConsole.exe"  # 夜神NoxConsole路径
+    nox_console_path = ''  # 夜神NoxConsole路径
 
     package_name = ''  # 游戏包名
     package_main_activity_name = ''  # 游戏活动名
