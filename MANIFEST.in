@@ -1,0 +1,7 @@
+recursive-include lazy_lib *.py
+recursive-include lazy_lib *.yaml
+recursive-include lazy_lib *.json
+recursive-include lazy_lib *.csv
+recursive-include lazy_lib *.md
+recursive-include lazy_lib *.exe
+recursive-include lazy_lib *.gitkeep

@@ -6,11 +6,12 @@ Date:2022/11/27
 import time
 from typing import Tuple
 
-from ui_control.adb_connection import ADBConnection, Screen
-from ui_control.client_socket import ClientSocket
-from ui_control.debug_log import debug_log
-from ui_control.nox_console import NoxConsole
-from ui_control.tree import UITree, ExactSearch, FuzzySearch, CaseSensitive
+from green_GA.adb_connection import ADBConnection, Screen
+from green_GA.client_socket import ClientSocket
+from green_GA.commands import Commands
+from green_GA.debug_log import debug_log
+from green_GA.nox_console import NoxConsole
+from green_GA.tree import UITree, ExactSearch, FuzzySearch, CaseSensitive
 
 
 class ElementBound(object):
@@ -115,46 +116,17 @@ class Element(object):
         return f'<{type(self).__module__}.{type(self).__name__} (object_name="{self.object_name}", instance="{self.instance}", components="{self.components}", txt ="{self.txt}", img ="{self.img}")>'
 
 
-class Commands(object):
-    GET_VERSION = 100  # 获取版本号
-    FIND_ELEMENTS = 101  # 查找节点
-    FIND_ELEMENT_PATH = 102  # 模糊查找
-    GET_ELEMENTS_BOUND = 103  # 获取节点的位置信息
-    GET_ELEMENT_WORLD_BOUND = 104  # 获取节点的世界坐标
-    GET_UI_INTERACT_STATUS = 105  # 获取游戏的可点击信息，包括scene、可点击节点，及位置信息
-    GET_CURRENT_SCENE = 106  # 获取Unity的Scene名称
-    GET_ELEMENT_TEXT = 107  # 获取节点的文字内容
-    GET_ELEMENT_IMAGE = 108  # 获取节点的图片名称
-    GET_REGISTERED_HANDLERS = 109  # 获取注册的函数的名称
-    CALL_REGISTER_HANDLER = 110  # 调用注册的函数
-    SET_INPUT_TEXT = 111  # input控件更换文字信息
-    GET_OBJECT_FIELD = 112  # 通过反射获取gameobject中component的属性值
-    FIND_ELEMENTS_COMPONENT = 113  # 获取所有包含改组件的gameobject
-    SET_CAMERA_NAME = 114  # 设置渲染的最佳的Camera
-    GET_COMPONENT_METHODS = 115  # 反射获取组件上的方法
-    CALL_COMPONENT_MOTHOD = 116  # 通过反射调用组件的函数
-    LOAD_TEST_LIB = 117  # 初始化testlib服务
-
-    PRC_SET_METHOD = 118  # 注册python端的方法
-    RPC_METHOD = 119  # 游戏内的接口可调用，python端的方法
-
-    #######################/
-    HANDLE_TOUCH_EVENTS = 200  # 发送down move up
-
-    DUMP_TREE = 300
-
-
 class UnitySDK(object):
     __slots__ = ['__ip', '__port', '__serial', '__sdk_port', '__tcp', '__adb_connection', '__socket', '__nox_console',
                  '__nox_name', '__encoding', '__timeout', '__update_connection', '__ui_delay', '__real_phone',
                  '__connected', '__ui_tree', '__width_dif', '__height_dif', '__reboot_limit', '__restart_limit',
-                 '__package_name', '__package_main_activity_name']
+                 '__package_name', '__package_main_activity_name', 'debug_mode']
 
     def __init__(self, ip: int or str, port: int or str, serial: str, real_phone: bool, package_name: str,
                  package_main_activity_name: str, sdk_port: int or str = '27019', nox_console_path: str = None,
                  nox_name: str = None, encoding: str = 'utf-8', timeout: int = 2, update_connection: int = 5,
                  ui_delay: float = 0.1, connect_at_init: bool = False, width_dif: float = 0, height_dif: float = 0,
-                 reboot_limit=60, restart_limit=60):
+                 reboot_limit=60, restart_limit=60, debug_mode=False):
         self.__ip = ip
         self.__port = port
         self.__serial = serial
@@ -177,6 +149,7 @@ class UnitySDK(object):
         self.__restart_limit = restart_limit
         self.__package_name = package_name
         self.__package_main_activity_name = package_main_activity_name
+        self.debug_mode = debug_mode
         if nox_console_path != None:
             self.__nox_console = NoxConsole(nox_console_path)
         if real_phone == False:
@@ -198,7 +171,7 @@ class UnitySDK(object):
         return self.__tcp
 
     @tcp.setter
-    def tcp(self, v:Tuple[str,str]):
+    def tcp(self, v: Tuple[str, str]):
         self.__tcp = v
 
     @property
@@ -261,7 +234,7 @@ class UnitySDK(object):
     @property
     def connected(self) -> bool:
         if self.adb_connection.check_adb_connection_ready(self.tcp,
-                self.__package_name) == True and self.socket.connected == True:
+                                                          self.__package_name) == True and self.socket.connected == True:
             self.__connected = True
         else:
             self.__connected = False
@@ -305,7 +278,6 @@ class UnitySDK(object):
         while self.adb_connection.connected != True and time_limit > 0:
             time_limit = time_limit - wait_time
             time.sleep(wait_time)
-
 
     def start_app(self, package_name: str, package_main_activity_name: str) -> None:
         self.__adb_connection.start_app(package_name, package_main_activity_name)
@@ -351,7 +323,7 @@ class UnitySDK(object):
     def disconnect(self) -> None:
         self.__disconnect()
 
-    def restart_game(self, package_name: str=None, package_main_activity_name: str=None) -> None:
+    def restart_game(self, package_name: str = None, package_main_activity_name: str = None) -> None:
         if not package_name:
             package_name = self.package_name
         if not package_main_activity_name:
@@ -364,7 +336,7 @@ class UnitySDK(object):
             if self.adb_connection.check_app_running(package_name) != True or self.adb_connection.check_app_focused(
                     package_name) != True:  # 保证app在运行
                 self.restart_app(package_name, package_main_activity_name)
-            if self.adb_connection.tcp_connected != True or self.socket.connected != True:  # 保证socket连接
+            if self.adb_connection.check_tcp_connected != True or self.socket.connected != True:  # 保证socket连接
                 self.connect()
             time_limit = time_limit - wait_time
             time.sleep(wait_time)
@@ -377,10 +349,10 @@ class UnitySDK(object):
         ret = self.send_command(Commands.GET_VERSION, 1)
         return ret
 
+    @debug_log
     def __send_command(self, command: int, param: str or int = None) -> dict:
         return self.__socket.send_command(command, param)
 
-    @debug_log
     def send_command(self, command: int, param: str or int = None) -> dict:
         if self.__ui_delay > 0:
             time.sleep(self.__ui_delay)

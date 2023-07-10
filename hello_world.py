@@ -5,7 +5,7 @@ Date:2022/12/9
 '''
 import time
 from multiprocessing import Process
-from ui_control import UnitySDK
+from green_GA import UnitySDK
 
 def get_in_game(connection, package_name, package_main_activity_name):
     connection.reboot()

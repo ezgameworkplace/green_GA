@@ -312,7 +312,7 @@ class ADBConnection():
                 return True
         return False
 
-    def check_adb_connection_ready(self, tcp_pair:Tuple[str, str], package_name:str) -> bool:
+    def check_adb_connection_ready(self, tcp_pair: Tuple[str, str], package_name: str) -> bool:
         if self.connected != True:
             # return False
             raise Exception('device is not connected')
@@ -327,11 +327,13 @@ class ADBConnection():
             raise Exception('app is not focused')
         return True
 
-    def __install_package(self, package_path:str) -> None:
+    def __install_package(self, package_path: str) -> None:
         adb_cmd = f"install -g {package_path}"
         self.run_adb_cmd(adb_cmd)
-    def install_package(self, package_path:str) -> None:
+
+    def install_package(self, package_path: str) -> None:
         self.__install_package(package_path)
+
 
 if __name__ == '__main__':
     serial = 'adb serial'
