@@ -392,7 +392,7 @@ class UnitySDK(object):
         return None
 
     def find_element(self, path: str) -> Element or None:
-        # FIXME 补全Element，需要修改sdk的C#代码
+        # FIXME 补全Element，需要修改sdk的C#代码, Commands.FIND_ELEMENTS只会返回名字和实例id，缺了txt/image等信息， 用FIND_ELEMENT_PATH可以补全这些信息，鬼知道为啥会有两个重复的功能
         # FIXME 加入参数visible，区分可见和不可见
         # 根据path找到元素,path可以不全,不补全path,同名只返回第一个
         ret = self.send_command(Commands.FIND_ELEMENTS, [path])
@@ -637,3 +637,24 @@ class UnitySDK(object):
         src_element = self.find_element(src)
         dst_element = self.find_element(dst)
         return self.swipe_element(src_element, dst_element, duration)
+
+    def wait(self, ui_path: str, exists=True, timeout=10, interval=0.1):
+        """
+        Wait until UI Element exists or gone
+        """
+        end_time = time.time() + timeout
+
+        while time.time() < end_time:
+            e = self.find_elements_by_path(ui_path)
+
+            if bool(e) == exists:
+                return True
+
+            # Wait for a while before trying again
+            time.sleep(interval)
+
+        return False
+
+    def wait_gone(self, ui_path: str, timeout: int = 10) -> bool:
+        # 等待元素消失
+        return self.wait(ui_path=ui_path, exists=False, timeout=timeout)
