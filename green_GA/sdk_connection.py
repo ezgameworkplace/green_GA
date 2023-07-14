@@ -658,3 +658,10 @@ class UnitySDK(object):
     def wait_gone(self, ui_path: str, timeout: int = 10) -> bool:
         # 等待元素消失
         return self.wait(ui_path=ui_path, exists=False, timeout=timeout)
+
+    def __call__(self, **kwargs):
+        # TODO create a ui selector
+        if "ui_path" in kwargs.keys():
+            return self.find_elements_by_path(kwargs["ui_path"])
+        else:
+            raise Exception("must into ui_path as kwargs")
