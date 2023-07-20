@@ -1,7 +1,7 @@
-recursive-include lazy_lib *.py
-recursive-include lazy_lib *.yaml
-recursive-include lazy_lib *.json
-recursive-include lazy_lib *.csv
-recursive-include lazy_lib *.md
-recursive-include lazy_lib *.exe
-recursive-include lazy_lib *.gitkeep
+recursive-include green_GA *.py
+recursive-include green_GA *.yaml
+recursive-include green_GA *.json
+recursive-include green_GA *.csv
+recursive-include green_GA *.md
+recursive-include green_GA *.exe
+recursive-include green_GA *.gitkeep
