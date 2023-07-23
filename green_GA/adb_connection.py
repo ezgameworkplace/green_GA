@@ -302,17 +302,17 @@ class ADBConnection():
 
     def check_adb_connection_ready(self, tcp_pair: Tuple[str, str], package_name: str) -> bool:
         if self.connected != True:
-            # return False
-            raise Exception('device is not connected')
+            return False
+            # raise Exception('device is not connected')
         if self.check_tcp_connected(tcp_pair) != True:
-            # return False
-            raise Exception('tcp is not connected')
+            return False
+            # raise Exception('tcp is not connected')
         if self.check_app_running(package_name) != True:
-            # return False
-            raise Exception('app is not running')
+            return False
+            # raise Exception('app is not running')
         if self.check_app_focused(package_name) != True:
-            # return False
-            raise Exception('app is not focused')
+            return False
+            # raise Exception('app is not focused')
         return True
 
     def __install_package(self, package_path: str) -> None:
