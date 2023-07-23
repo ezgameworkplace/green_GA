@@ -82,3 +82,52 @@ class UITree(object):
 
     def get_nodes_by_attr_value(self, attr: str, search: str, mode=ExactSearch, case=CaseSensitive) -> [dict]:
         return [self.get_node_attr(node) for node in self.__get_nodes_by_attr_value(attr, search, mode, case)]
+
+    def get_sibling_node_by_search_name_and_txt(self, search_name: str, search_ui_txt: str, sibling_name: str,
+                                                case=CaseSensitive) -> [dict]:
+        # get nodes by 'name' attribute
+        search_nodes = self.__get_nodes_by_attr_value('name', search_name, ExactSearch, case)
+
+        # filter nodes by 'txt' attribute
+        search_nodes = [node for node in search_nodes if node.attrib.get('txt') == search_ui_txt]
+
+        # raise error if no search node found
+        if not search_nodes:
+            raise Exception(f"No node found with name '{search_name}' and text '{search_ui_txt}'")
+
+        # assume the first node as the search node
+        search_node = search_nodes[0]
+
+        # find the sibling node
+        parent = search_node.getparent()
+        for child in parent:
+            if 'name' in child.attrib and child.attrib['name'] == sibling_name:
+                return self.get_node_attr(child)
+
+        raise Exception(f"No sibling node found with name '{sibling_name}'")
+
+    def get_sibling_child_by_search_name_and_txt(self, search_name: str, search_ui_txt: str, sibling_child_name: str,
+                                                 case=CaseSensitive) -> [dict]:
+        # get nodes by 'name' attribute
+        search_nodes = self.__get_nodes_by_attr_value('name', search_name, ExactSearch, case)
+
+        # filter nodes by 'txt' attribute
+        search_nodes = [node for node in search_nodes if node.attrib.get('txt') == search_ui_txt]
+
+        # raise error if no search node found
+        if not search_nodes:
+            raise Exception(f"No node found with name '{search_name}' and text '{search_ui_txt}'")
+
+        # assume the first node as the search node
+        search_node = search_nodes[0]
+
+        # find the sibling node's child
+        sibling_child = None
+        parent = search_node.getparent()
+        for child in parent:
+            grandchilds = child.getchildren()
+            for grandchild in grandchilds:
+                if 'name' in grandchild.attrib and grandchild.attrib['name'] == sibling_child_name:
+                    return self.get_node_attr(grandchild)
+
+        raise Exception(f"No sibling child node found with name '{sibling_child_name}'")
