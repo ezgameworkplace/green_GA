@@ -239,22 +239,10 @@ class ADBConnection():
         adb_cmd = f'pidof {package_name}'
         return self.run_shell_cmd(adb_cmd)
 
-    def return_pid(self, package_name) -> bool:
+    def return_pid(self, package_name) -> int:
         # FIXME
-        ps = self.__ps()
-        # print("ps", ps)
-        for line in ps:
-            if package_name in line:
-                return True
-        return False
-        # lines = ps.split('\n')
-        # package = [line for line in lines if f'{package_name}' in line][0]
-        # name = package.split(' ')
-        # pid = name[4]
-        # print(pid)
-        # return int(pid)
-        # ret = int(self.__return_pid(package_name))
-        # return ret
+        ret = int(self.__return_pid(package_name))
+        return ret
 
     def check_app_running(self, package_name) -> bool:
         try:
