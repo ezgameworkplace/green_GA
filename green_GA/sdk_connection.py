@@ -666,12 +666,12 @@ class UnitySDK(object):
         else:
             raise Exception("must into ui_path as kwargs")
 
-    def search_silbing_element_by_search_name_and_txt(self, search_name: str, search_ui_txt: str, sibling_name: str,
+    def search_sibling_element_by_search_name_and_txt(self, search_name: str, search_ui_txt: str, sibling_name: str,
                                                 case=CaseSensitive) -> [dict]:
         return self.__parse_node(self.ui_tree.get_sibling_node_by_search_name_and_txt(search_name=search_name, search_ui_txt=search_ui_txt, sibling_name=sibling_name,
                                                 case=case))
 
-    def search_silbing_child_element_by_search_name_and_txt(self, search_name: str, search_ui_txt: str, sibling_child_name: str,
+    def search_sibling_child_element_by_search_name_and_txt(self, search_name: str, search_ui_txt: str, sibling_child_name: str,
                                                 case=CaseSensitive) -> [dict]:
         return self.__parse_node(self.ui_tree.get_sibling_child_by_search_name_and_txt(search_name=search_name, search_ui_txt=search_ui_txt, sibling_child_name=sibling_child_name,
                                                 case=case))
