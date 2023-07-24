@@ -639,7 +639,7 @@ class UnitySDK(object):
         dst_element = self.find_element(dst)
         return self.swipe_element(src_element, dst_element, duration)
 
-    def wait(self, ui_path: str, exists=True, timeout=10, interval=0.1):
+    def wait(self, ui_path: str, exists=True, timeout=10, interval=0.25):
         """
         Wait until UI Element exists or gone
         """
