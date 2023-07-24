@@ -287,7 +287,8 @@ class UnitySDK(object):
 
     def __restart_app(self, package_name: str, package_main_activity_name: str) -> None:
         try:
-            self.kill_app(package_name)
+            self.kill_app(package_name) # TODO 设备没启动的时候会报错的
+            time.sleep(self.__update_connection)
             self.start_app(package_name, package_main_activity_name)
         except:
             self.start_app(package_name, package_main_activity_name)
