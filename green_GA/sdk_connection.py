@@ -160,7 +160,7 @@ class UnitySDK(object):
             self.connect()
 
     def __str__(self):
-        return f'ip:{self.__ip}\nport:{self.__port}\nserial:{self.__serial}\nadb_connection:{self.__adb_connection}\nsocket:{self.__socket}\nnox_console:{self.__nox_console}'
+        return f'ip:{self.__ip}\nport:{self.__port}\nserial:{self.__serial}\nadb_connection:{self.__adb_connection}\nsocket:{self.__socket}\nnox_console:{self.__nox_console}\npackage_name:{self.package_name}'
 
     @property
     def port(self) -> str:
@@ -287,7 +287,7 @@ class UnitySDK(object):
 
     def __restart_app(self, package_name: str, package_main_activity_name: str) -> None:
         try:
-            self.kill_app(package_name) # TODO 设备没启动的时候会报错的
+            self.kill_app(package_name)  # TODO 设备没启动的时候会报错的
             time.sleep(self.__update_connection)
             self.start_app(package_name, package_main_activity_name)
         except:
@@ -660,19 +660,24 @@ class UnitySDK(object):
         # 等待元素消失
         return self.wait(ui_path=ui_path, exists=False, timeout=timeout)
 
+    def search_sibling_element_by_search_name_and_txt(self, search_name: str, search_ui_txt: str, sibling_name: str,
+                                                      case=CaseSensitive) -> [dict]:
+        return self.__parse_node(
+            self.ui_tree.get_sibling_node_by_search_name_and_txt(search_name=search_name, search_ui_txt=search_ui_txt,
+                                                                 sibling_name=sibling_name,
+                                                                 case=case))
+
+    def search_sibling_child_element_by_search_name_and_txt(self, search_name: str, search_ui_txt: str,
+                                                            sibling_child_name: str,
+                                                            case=CaseSensitive) -> [dict]:
+        return self.__parse_node(
+            self.ui_tree.get_sibling_child_by_search_name_and_txt(search_name=search_name, search_ui_txt=search_ui_txt,
+                                                                  sibling_child_name=sibling_child_name,
+                                                                  case=case))
+
     def __call__(self, **kwargs):
         # TODO create a ui selector
         if "ui_path" in kwargs.keys():
             return self.find_elements_by_path(kwargs["ui_path"])
         else:
             raise Exception("must into ui_path as kwargs")
-
-    def search_sibling_element_by_search_name_and_txt(self, search_name: str, search_ui_txt: str, sibling_name: str,
-                                                case=CaseSensitive) -> [dict]:
-        return self.__parse_node(self.ui_tree.get_sibling_node_by_search_name_and_txt(search_name=search_name, search_ui_txt=search_ui_txt, sibling_name=sibling_name,
-                                                case=case))
-
-    def search_sibling_child_element_by_search_name_and_txt(self, search_name: str, search_ui_txt: str, sibling_child_name: str,
-                                                case=CaseSensitive) -> [dict]:
-        return self.__parse_node(self.ui_tree.get_sibling_child_by_search_name_and_txt(search_name=search_name, search_ui_txt=search_ui_txt, sibling_child_name=sibling_child_name,
-                                                case=case))
