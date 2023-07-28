@@ -675,6 +675,15 @@ class UnitySDK(object):
                                                                   sibling_child_name=sibling_child_name,
                                                                   case=case))
 
+    def search_closest_element_by_search_name_and_txt(self, search_name: str, search_ui_txt: str,
+                                                      closest_name: str,
+                                                      case=CaseSensitive) -> [dict]:
+        # 子节点优先
+        return self.__parse_node(
+            self.ui_tree.get_closest_node(search_node_name=search_name, search_ui_txt=search_ui_txt,
+                                          another_node_name=closest_name,
+                                          case=case))
+
     def __call__(self, **kwargs):
         # TODO create a ui selector
         if "ui_path" in kwargs.keys():

@@ -131,3 +131,53 @@ class UITree(object):
                     return self.get_node_attr(grandchild)
 
         raise Exception(f"No sibling child node found with name '{sibling_child_name}'")
+
+    def get_closest_node(self, search_node_name: str, search_ui_txt: str, another_node_name: str,
+                         case=CaseSensitive) -> [dict]:
+        # get nodes by 'name' attribute
+        search_nodes = self.__get_nodes_by_attr_value('name', search_node_name, ExactSearch, case)
+
+        # filter nodes by 'txt' attribute
+        search_nodes = [node for node in search_nodes if node.attrib.get('txt') == search_ui_txt]
+
+        # raise error if no search node found
+        if not search_nodes:
+            raise Exception(f"No node found with name '{search_node_name}' and text '{search_ui_txt}'")
+
+        # assume the first node as the search node
+        search_node = search_nodes[0]
+
+        # check children of the search node first
+        closest_node = self._dfs(search_node, another_node_name)
+        if closest_node is not None:
+            return self.get_node_attr(closest_node)
+
+        # find the closest node with another_node_name
+        closest_node = self._bfs_dfs(search_node, another_node_name)
+
+        if closest_node is None:
+            raise Exception(f"No closest node found with name '{another_node_name}'")
+        else:
+            return self.get_node_attr(closest_node)
+
+    def _bfs_dfs(self, node, another_node_name):
+        queue = [node]
+        while queue:
+            current_node = queue.pop(0)
+            if 'name' in current_node.attrib and current_node.attrib['name'] == another_node_name:
+                return current_node
+            closest_node = self._dfs(current_node, another_node_name)
+            if closest_node is not None:
+                return closest_node
+            if current_node.getparent() is not None:
+                queue.append(current_node.getparent())
+        return None
+
+    def _dfs(self, node, another_node_name):
+        for child in node:
+            if 'name' in child.attrib and child.attrib['name'] == another_node_name:
+                return child
+            closest_node = self._dfs(child, another_node_name)
+            if closest_node is not None:
+                return closest_node
+        return None
