@@ -7,6 +7,7 @@ import xml.dom.minidom
 import xml.etree.ElementTree
 
 import lxml.etree as ET
+from utils import get_element_hash
 
 ExactSearch = 1
 FuzzySearch = 0
@@ -181,3 +182,18 @@ class UITree(object):
             if closest_node is not None:
                 return closest_node
         return None
+
+    def save_tree(self,save_path:str):
+        tree_element = ET.fromstring(self.xml_tree)
+        tree = ET.ElementTree(tree_element)  # 创建ElementTree对象
+        with open(save_path, 'wb') as file:
+            tree.write(file, pretty_print=True)
+
+    def get_node_by_hash(self, hash_code:str) -> dict:
+        tree_element = ET.fromstring(self.xml_tree)
+        tree = ET.ElementTree(tree_element)  # 创建ElementTree对象
+        root = tree.getroot()  # 获取根元素
+        for node in root.iter():
+            if get_element_hash(node) == hash_code:
+                return self.get_node_attr(node)
+

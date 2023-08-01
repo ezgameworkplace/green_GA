@@ -684,9 +684,14 @@ class UnitySDK(object):
                                           another_node_name=closest_name,
                                           case=case))
 
+    def search_element_by_hash_code(self, hash_code:str):
+        return self.__parse_node(self.ui_tree.get_node_by_hash(hash_code))
+
     def __call__(self, **kwargs):
         # TODO create a ui selector
         if "ui_path" in kwargs.keys():
             return self.find_elements_by_path(kwargs["ui_path"])
         else:
             raise Exception("must into ui_path as kwargs")
+
+
