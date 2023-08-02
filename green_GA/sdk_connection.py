@@ -428,7 +428,9 @@ class UnitySDK(object):
                self.ui_tree.get_all_nodes()]
         return ret
 
-    def __parse_node(self, node: dict) -> Element:
+    def __parse_node(self, node: dict) -> Element or None:
+        if node is None:
+            return None
         custom = ['name', 'id', 'components', 'txt', 'img']
         e = {k: None if k not in node.keys() else node[k] for k in custom}
         return Element(object_name=e["name"], instance=e["id"], components=e["components"], txt=e["txt"], img=e["img"])
@@ -695,3 +697,22 @@ class UnitySDK(object):
             raise Exception("must into ui_path as kwargs")
 
 
+if __name__ == '__main__':
+    ip = 'localhost'
+    package_name = 'com.dts.freefireth'  # 游戏包名
+    package_main_activity_name = 'com.dts.freefireth.FFMainActivity'  # 游戏活动名
+
+    port1 = '60025'  # 本地端口1
+    serial1 = '127.0.0.1:62071'  # adb端口号1
+
+
+    phone1 = UnitySDK(ip, port1, serial1, real_phone=True, package_name=package_name,
+                      package_main_activity_name=package_main_activity_name, connect_at_init=False, debug_mode=True,
+                      ui_delay=0.1)
+
+    phone1.connect()
+
+    hash_code = "e7a4963c0b39c6e961a4a12beeb92845d042835f1c3591a7c6fe505dbf17808c"
+    e = phone1.search_element_by_hash_code(hash_code)
+    print(e)
+    phone1.click_element(e)
