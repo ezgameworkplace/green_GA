@@ -17,7 +17,7 @@ CaseSensitive = 1
 CaseInsensitive = 0
 
 
-class UITree(object):
+class UITree():
 
     def __init__(self):
         self._xml_tree = None
@@ -199,3 +199,14 @@ class UITree(object):
             if get_element_hash(node) == hash_code:
                 return self.get_node_attr(node)
         return None
+
+    @property
+    def ui_tree_with_hash_code(self):
+        tree_element = ET.fromstring(self.xml_tree)
+        tree = ET.ElementTree(tree_element)  # 创建ElementTree对象
+        root = tree.getroot()  # 获取根元素
+        for node in root.iter():
+            node.attrib['hash'] = get_element_hash(node)
+        _xml = xml.dom.minidom.parseString(ET.tostring(root, encoding='utf-8').decode('utf-8'))
+        pretty_xml_as_string = _xml.toprettyxml()
+        return pretty_xml_as_string

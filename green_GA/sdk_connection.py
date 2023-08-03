@@ -160,7 +160,7 @@ class UnitySDK(object):
             self.connect()
 
     def __str__(self):
-        return f'ip:{self.__ip}\nport:{self.__port}\nserial:{self.__serial}\nadb_connection:{self.__adb_connection}\nsocket:{self.__socket}\nnox_console:{self.__nox_console}\npackage_name:{self.package_name}'
+        return f'Current UnitySDK: \nip:{self.__ip}\nport:{self.__port}\nserial:{self.__serial}\n'
 
     @property
     def port(self) -> str:
@@ -686,7 +686,7 @@ class UnitySDK(object):
                                           another_node_name=closest_name,
                                           case=case))
 
-    def search_element_by_hash_code(self, hash_code:str):
+    def search_element_by_hash_code(self, hash_code: str):
         return self.__parse_node(self.ui_tree.get_node_by_hash(hash_code))
 
     def __call__(self, **kwargs):
@@ -696,4 +696,29 @@ class UnitySDK(object):
         else:
             raise Exception("must into ui_path as kwargs")
 
+    def save_tree(self, save_path: str):
+        self.ui_tree.save_tree(save_path)
 
+    @property
+    def hash_code_tree(self):
+        return self.ui_tree.ui_tree_with_hash_code
+
+# if __name__ == '__main__':
+#     ip = 'localhost'
+#     package_name = 'com.dts.freefireth'  # 游戏包名
+#     package_main_activity_name = 'com.dts.freefireth.FFMainActivity'  # 游戏活动名
+#
+#     port1 = '60025'  # 本地端口1
+#     serial1 = '127.0.0.1:62071'  # adb端口号1
+#
+#
+#     phone1 = UnitySDK(ip, port1, serial1, real_phone=True, package_name=package_name,
+#                       package_main_activity_name=package_main_activity_name, connect_at_init=False, debug_mode=True,
+#                       ui_delay=0.1)
+#
+#     phone1.connect()
+#     # phone1.save_tree("output5.xml")
+#     #
+#     # print(phone1.hash_code_tree)
+#     e = phone1.search_element_by_hash_code("89cf1f1dcb10278c6afcf4c46763e9e58422786ea83238baea7f95d5d6627331")
+#     phone1.click_element(e)

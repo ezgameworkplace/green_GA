@@ -55,11 +55,15 @@ def get_great_grandparent(element: etree.Element) -> List[etree.Element] or None
     return _get_parent_by_level(element, 4)
 
 
-def normalize_feature_string(feature_string: str) -> str:
-    return ''.join(sorted(feature_string))
+def get_following_siblings(element: etree.Element) -> List[etree.Element] or None:
+    return list(element.itersiblings(preceding=False))
 
 
-def get_element_hash(element: etree.Element, attr_filter: List = None):
+def get_preceding_siblings(element: etree.Element) -> List[etree.Element] or None:
+    return list(element.itersiblings(preceding=True))
+
+
+def get_parent_features(element: etree.Element, attr_filter: List = None) -> str:
     if attr_filter is None:
         attr_filter = USEFUL_ATTR
     string_attributes = []
@@ -75,13 +79,39 @@ def get_element_hash(element: etree.Element, attr_filter: List = None):
             # 考虑后兄弟
             for sibling in parent.itersiblings(preceding=False):
                 string_attributes.extend(filter_attr(sibling, attr_filter))
-    parent_features = ''.join(string_attributes)
-    parent_features = normalize_feature_string(parent_features)
+    return ''.join(string_attributes)
+
+
+def get_sibling_features(element: etree.Element, attr_filter: List = None) -> str:
+    if attr_filter is None:
+        attr_filter = USEFUL_ATTR
+    string_attributes = []
+    following_siblings = get_following_siblings(element)
+    preceding_siblings = get_preceding_siblings(element)
+    # 考虑前兄弟
+    for sibling in following_siblings:
+        string_attributes.extend(filter_attr(sibling, attr_filter))
+    # 考虑后兄弟
+    for sibling in preceding_siblings:
+        string_attributes.extend(filter_attr(sibling, attr_filter))
+    return ''.join(string_attributes)
+
+
+def normalize_feature_string(feature_string: str) -> str:
+    return ''.join(sorted(feature_string))
+
+
+def get_element_hash(element: etree.Element, attr_filter: List = None):
+    if attr_filter is None:
+        attr_filter = USEFUL_ATTR
+    parent_features = normalize_feature_string(get_parent_features(element, attr_filter))
+    sibling_features = normalize_feature_string(get_sibling_features(element, attr_filter))
     features = [
         parent_features,
+        sibling_features,
         element.tag,
         element.get('name'),
-        element.get('components'),
+        # element.get('components'), 有时组件会被关闭，不建议将组件加入哈希特征
         element.get('img'),
         element.get('txt'),
         # 添加更多特性
