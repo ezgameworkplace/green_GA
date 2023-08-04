@@ -703,22 +703,4 @@ class UnitySDK(object):
     def hash_code_tree(self):
         return self.ui_tree.ui_tree_with_hash_code
 
-# if __name__ == '__main__':
-#     ip = 'localhost'
-#     package_name = 'com.dts.freefireth'  # 游戏包名
-#     package_main_activity_name = 'com.dts.freefireth.FFMainActivity'  # 游戏活动名
-#
-#     port1 = '60025'  # 本地端口1
-#     serial1 = '127.0.0.1:62071'  # adb端口号1
-#
-#
-#     phone1 = UnitySDK(ip, port1, serial1, real_phone=True, package_name=package_name,
-#                       package_main_activity_name=package_main_activity_name, connect_at_init=False, debug_mode=True,
-#                       ui_delay=0.1)
-#
-#     phone1.connect()
-#     # phone1.save_tree("output5.xml")
-#     #
-#     # print(phone1.hash_code_tree)
-#     e = phone1.search_element_by_hash_code("89cf1f1dcb10278c6afcf4c46763e9e58422786ea83238baea7f95d5d6627331")
-#     phone1.click_element(e)
+
