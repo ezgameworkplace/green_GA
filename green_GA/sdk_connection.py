@@ -4,7 +4,7 @@ Author:ezgameworkplace
 Date:2022/11/27
 '''
 import time
-from typing import Tuple
+from typing import Tuple, Any
 
 from green_GA.adb_connection import ADBConnection, Screen
 from green_GA.client_socket import ClientSocket
@@ -354,7 +354,7 @@ class UnitySDK(object):
     def __send_command(self, command: int, param: str or int = None) -> dict:
         return self.__socket.send_command(command, param)
 
-    def send_command(self, command: int, param: str or int = None) -> dict:
+    def send_command(self, command: int, param: str or int = None) -> Any:
         if self.__ui_delay > 0:
             time.sleep(self.__ui_delay)
         ret = self.__send_command(command, param)
@@ -557,7 +557,7 @@ class UnitySDK(object):
                                 {"instance": element.instance, "comopentName": component})
         return ret
 
-    def call_component_method(self, element: Element, component: str, method: str, params: str or None) -> dict:
+    def call_component_method(self, element: Element, component: str, method: str, params: str or None) -> Any:
         # 调用component的方法 TODO 只支持get方法，其他需要c#支持
         ret = self.send_command(Commands.CALL_COMPONENT_MOTHOD,
                                 {"instance": element.instance, "comopentName": component,

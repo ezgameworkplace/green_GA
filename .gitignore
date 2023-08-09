@@ -1,0 +1,8 @@
+# PyCharm files
+.idea/
+
+# Python byte compiled files
+__pycache__/
+
+# Customs
+*.log
