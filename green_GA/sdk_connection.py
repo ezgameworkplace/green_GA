@@ -703,4 +703,16 @@ class UnitySDK(object):
     def hash_code_tree(self):
         return self.ui_tree.ui_tree_with_hash_code
 
+    def check_path_exist(self, ui_path: str) -> bool:
+        ret = self.find_elements_by_path(ui_path)
+        if ret:
+            return True
+        else:
+            return False
 
+    def check_element_exist(self, e: Element) -> bool:
+        ret = self.find_elements_by_path(e.object_name)
+        if ret:
+            return True
+        else:
+            return False
