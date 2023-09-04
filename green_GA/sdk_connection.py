@@ -663,7 +663,7 @@ class UnitySDK(object):
         return self.wait(ui_path=ui_path, exists=False, timeout=timeout)
 
     def search_sibling_element_by_search_name_and_txt(self, search_name: str, search_ui_txt: str, sibling_name: str,
-                                                      case=CaseSensitive) -> [Element]:
+                                                      case=CaseSensitive) -> Element:
         return self.__parse_node(
             self.ui_tree.get_sibling_node_by_search_name_and_txt(search_name=search_name, search_ui_txt=search_ui_txt,
                                                                  sibling_name=sibling_name,
@@ -671,7 +671,7 @@ class UnitySDK(object):
 
     def search_sibling_child_element_by_search_name_and_txt(self, search_name: str, search_ui_txt: str,
                                                             sibling_child_name: str,
-                                                            case=CaseSensitive) -> [Element]:
+                                                            case=CaseSensitive) -> Element:
         return self.__parse_node(
             self.ui_tree.get_sibling_child_by_search_name_and_txt(search_name=search_name, search_ui_txt=search_ui_txt,
                                                                   sibling_child_name=sibling_child_name,
@@ -679,14 +679,14 @@ class UnitySDK(object):
 
     def search_closest_element_by_search_name_and_txt(self, search_name: str, search_ui_txt: str,
                                                       closest_name: str,
-                                                      case=CaseSensitive) -> [Element]:
+                                                      case=CaseSensitive) -> Element:
         # 子节点优先
         return self.__parse_node(
             self.ui_tree.get_closest_node(search_node_name=search_name, search_ui_txt=search_ui_txt,
                                           another_node_name=closest_name,
                                           case=case))
 
-    def search_element_by_hash_code(self, hash_code: str):
+    def search_element_by_hash_code(self, hash_code: str)-> Element:
         return self.__parse_node(self.ui_tree.get_node_by_hash(hash_code))
 
     def __call__(self, **kwargs):
