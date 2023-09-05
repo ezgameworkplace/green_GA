@@ -429,7 +429,7 @@ class UnitySDK(object):
         return ret
 
     def __parse_node(self, node: dict) -> Element or None:
-        if node is None:
+        if node is None or node == {}:
             return None
         custom = ['name', 'id', 'components', 'txt', 'img']
         e = {k: None if k not in node.keys() else node[k] for k in custom}

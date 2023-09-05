@@ -96,7 +96,8 @@ class UITree():
 
         # raise error if no search node found
         if not search_nodes:
-            raise Exception(f"No node found with name '{search_name}' and text '{search_ui_txt}'")
+            return {}
+            # raise Exception(f"No node found with name '{search_name}' and text '{search_ui_txt}'")
 
         # assume the first node as the search node
         search_node = search_nodes[0]
@@ -107,7 +108,8 @@ class UITree():
             if 'name' in child.attrib and child.attrib['name'] == sibling_name:
                 return self.get_node_attr(child)
 
-        raise Exception(f"No sibling node found with name '{sibling_name}'")
+        return {}
+        # raise Exception(f"No sibling node found with name '{sibling_name}'")
 
     def get_sibling_child_by_search_name_and_txt(self, search_name: str, search_ui_txt: str, sibling_child_name: str,
                                                  case=CaseSensitive) -> Dict:
@@ -119,7 +121,8 @@ class UITree():
 
         # raise error if no search node found
         if not search_nodes:
-            raise Exception(f"No node found with name '{search_name}' and text '{search_ui_txt}'")
+            return {}
+            # raise Exception(f"No node found with name '{search_name}' and text '{search_ui_txt}'")
 
         # assume the first node as the search node
         search_node = search_nodes[0]
@@ -133,7 +136,8 @@ class UITree():
                 if 'name' in grandchild.attrib and grandchild.attrib['name'] == sibling_child_name:
                     return self.get_node_attr(grandchild)
 
-        raise Exception(f"No sibling child node found with name '{sibling_child_name}'")
+        return {}
+        # raise Exception(f"No sibling child node found with name '{sibling_child_name}'")
 
     def get_closest_node(self, search_node_name: str, search_ui_txt: str, another_node_name: str,
                          case=CaseSensitive) -> Dict:
@@ -145,7 +149,8 @@ class UITree():
 
         # raise error if no search node found
         if not search_nodes:
-            raise Exception(f"No node found with name '{search_node_name}' and text '{search_ui_txt}'")
+            return {}
+            # raise Exception(f"No node found with name '{search_node_name}' and text '{search_ui_txt}'")
 
         # assume the first node as the search node
         search_node = search_nodes[0]
@@ -159,7 +164,8 @@ class UITree():
         closest_node = self._bfs_dfs(search_node, another_node_name)
 
         if closest_node is None:
-            raise Exception(f"No closest node found with name '{another_node_name}'")
+            # raise Exception(f"No closest node found with name '{another_node_name}'")
+            return {}
         else:
             return self.get_node_attr(closest_node)
 
