@@ -127,8 +127,8 @@ class UnitySDK(object):
                  nox_name: str = None, encoding: str = 'utf-8', timeout: int = 2, update_connection: int = 5,
                  ui_delay: float = 0.1, connect_at_init: bool = False, width_dif: float = 0, height_dif: float = 0,
                  reboot_limit=60, restart_limit=60, debug_mode=False):
-        self.__ip = ip
-        self.__port = port
+        self.__ip = str(ip)
+        self.__port = str(port)
         self.__serial = serial
         self.__sdk_port = sdk_port
         self.__nox_name = nox_name
