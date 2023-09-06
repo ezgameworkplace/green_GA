@@ -18,7 +18,6 @@ setup(
     version='0.1.8',
     packages=find_packages(),
     author='ezgamer',
-    author_email='hongzhang.ji@garena.com',
     description='A green lib for ga person.',
     install_requires=parse_requirements("requirements.txt"),
     include_package_data=True,
