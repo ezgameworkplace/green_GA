@@ -374,7 +374,7 @@ class UnitySDK(object):
         # 根据path找到元素,path可以不全,补全path,同名返回所有
         parsed_nodes = self._parse_path(path)
         elements = self.send_command(Commands.FIND_ELEMENT_PATH, parsed_nodes)
-        return [self.search_element_by_id(e["instance"]) for e in elements]
+        return [el for e in elements if (el := self.search_element_by_id(e["instance"])) is not None]
 
     def find_element_by_path_and_location(self, path: str, x: float, y: float,
                                           error: float = 50) -> 'Element' or None:
@@ -449,20 +449,23 @@ class UnitySDK(object):
 
     def search_element_by_name(self, search: str, mode=FuzzySearch, case=CaseSensitive) -> [Element]:
         # 通过dump_tree根据path返回匹配的元素(类似find_elements_by_path,但是不补齐path)
-        return [self.__parse_node(node) for node in self.ui_tree.get_nodes_by_attr_value('name', search, mode, case)]
+        return [element for node in self.ui_tree.get_nodes_by_attr_value('name', search, mode, case) if
+                (element := self.__parse_node(node)) is not None]
 
     def search_element_by_components(self, search: str, mode=FuzzySearch, case=CaseSensitive) -> [Element]:
         # 通过dump_tree根据component返回匹配的元素
-        return [self.__parse_node(node) for node in
-                self.ui_tree.get_nodes_by_attr_value('components', search, mode, case)]
+        return [element for node in self.ui_tree.get_nodes_by_attr_value('components', search, mode, case) if
+                (element := self.__parse_node(node)) is not None]
 
     def search_element_by_txt(self, search: str, mode=FuzzySearch, case=CaseSensitive) -> [Element]:
         # 通过dump_tree根据txt返回匹配的元素
-        return [self.__parse_node(node) for node in self.ui_tree.get_nodes_by_attr_value('txt', search, mode, case)]
+        return [element for node in self.ui_tree.get_nodes_by_attr_value('txt', search, mode, case) if
+                (element := self.__parse_node(node)) is not None]
 
     def search_element_by_img(self, search: str, mode=FuzzySearch, case=CaseSensitive) -> [Element]:
         # 通过dump_tree根据img返回匹配的元素
-        return [self.__parse_node(node) for node in self.ui_tree.get_nodes_by_attr_value('img', search, mode, case)]
+        return [element for node in self.ui_tree.get_nodes_by_attr_value('img', search, mode, case) if
+                (element := self.__parse_node(node)) is not None]
 
     def __point_in_bound(self, x: float, y: float, element: Element) -> bool:
         element_bound = self.get_element_bound(element)
@@ -692,7 +695,7 @@ class UnitySDK(object):
                                           another_node_name=closest_name,
                                           case=case))
 
-    def search_element_by_hash_code(self, hash_code: str)-> Element:
+    def search_element_by_hash_code(self, hash_code: str) -> Element:
         return self.__parse_node(self.ui_tree.get_node_by_hash(hash_code))
 
     def __call__(self, **kwargs):
