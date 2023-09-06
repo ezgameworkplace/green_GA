@@ -15,7 +15,7 @@ def parse_requirements(filename):
 
 setup(
     name='green_GA',
-    version='0.1.6',
+    version='0.1.7',
     packages=find_packages(),
     author='ezgamer',
     author_email='hongzhang.ji@garena.com',

@@ -436,9 +436,15 @@ class UnitySDK(object):
         return Element(object_name=e["name"], instance=e["id"], components=e["components"], txt=e["txt"], img=e["img"])
 
     def search_element_by_id(self, id) -> Element:
-        ret = [self.__parse_node(node) for node in
-               self.ui_tree.get_nodes_by_attr_value('id', id, mode=ExactSearch)]
-        if ret != []:
+        # ret = [self.__parse_node(node) for node in
+        #        self.ui_tree.get_nodes_by_attr_value('id', id, mode=ExactSearch)]
+        # if ret != []:
+        #     return ret[0]
+
+        parsed_nodes = [self.__parse_node(node) for node in
+                        self.ui_tree.get_nodes_by_attr_value('id', id, mode=ExactSearch)]
+
+        if (ret := [node for node in parsed_nodes if node is not None]):
             return ret[0]
 
     def search_element_by_name(self, search: str, mode=FuzzySearch, case=CaseSensitive) -> [Element]:
